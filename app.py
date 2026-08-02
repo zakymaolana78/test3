@@ -40,7 +40,7 @@ st.markdown(
 st.markdown(
     """
     Aplikasi ini menggunakan data Kabupaten Indramayu
-    dan Kota Depok tahun **2018–2023** untuk membangun
+    dan Kota Depok tahun **2018–2024** untuk membangun
     model prediksi dan melakukan estimasi jumlah balita
     stunting tahun **2025–2027**.
     """
@@ -58,13 +58,13 @@ def load_data():
         "dataset_indramayu_depok.csv"
     )
 
-    # Membersihkan nama kolom
+    # Membersihkan spasi pada nama kolom
     df.columns = (
         df.columns
         .str.strip()
     )
 
-    # Mengubah kolom numerik
+    # Kolom numerik
     kolom_numerik = [
         "kode_kabupaten_kota",
         "tahun",
@@ -75,6 +75,7 @@ def load_data():
         "jumlah_nakes_gizi"
     ]
 
+    # Mengubah kolom menjadi numerik
     for kolom in kolom_numerik:
 
         if kolom in df.columns:
@@ -87,13 +88,15 @@ def load_data():
     # Menghapus data kosong
     df = df.dropna().copy()
 
-    # Mengurutkan data
+    # Mengurutkan berdasarkan wilayah dan tahun
     df = df.sort_values(
         [
             "nama_kabupaten_kota",
             "tahun"
         ]
-    ).reset_index(drop=True)
+    ).reset_index(
+        drop=True
+    )
 
     return df
 
@@ -142,7 +145,7 @@ def load_future_prediction():
 
 
 # =========================================================
-# LOAD EVALUASI MODEL
+# LOAD HASIL EVALUASI
 # =========================================================
 
 @st.cache_data
@@ -180,7 +183,7 @@ def load_feature_importance():
 
 
 # =========================================================
-# LOAD SEMUA DATA DAN MODEL
+# LOAD SEMUA DATA
 # =========================================================
 
 try:
@@ -196,6 +199,7 @@ try:
     df_eval = load_evaluation()
 
     df_feature = load_feature_importance()
+
 
 except Exception as e:
 
@@ -226,7 +230,9 @@ fitur = [
 ]
 
 
-target = "jumlah_balita_stunting"
+target = (
+    "jumlah_balita_stunting"
+)
 
 
 # =========================================================
@@ -276,15 +282,20 @@ if kolom_hilang:
         kolom_hilang
     )
 
-    st.write(
-        "Kolom yang tersedia:"
-    )
-
-    st.write(
-        df.columns.tolist()
-    )
-
     st.stop()
+
+
+# =========================================================
+# VALIDASI RENTANG DATA
+# =========================================================
+
+tahun_min = int(
+    df["tahun"].min()
+)
+
+tahun_max = int(
+    df["tahun"].max()
+)
 
 
 # =========================================================
@@ -300,7 +311,7 @@ st.sidebar.write(
 )
 
 st.sidebar.write(
-    "Periode Data: 2018–2023"
+    f"Periode Data: {tahun_min}–{tahun_max}"
 )
 
 st.sidebar.write(
@@ -308,7 +319,7 @@ st.sidebar.write(
 )
 
 st.sidebar.write(
-    "Model: Random Forest Regressor"
+    "Model Utama: Random Forest Regressor"
 )
 
 st.sidebar.write(
@@ -317,12 +328,26 @@ st.sidebar.write(
 
 
 # =========================================================
-# DATASET AKTUAL
+# PERINGATAN JIKA DATA BELUM SAMPAI 2024
+# =========================================================
+
+if tahun_max < 2024:
+
+    st.warning(
+        f"Dataset yang sedang digunakan hanya memiliki "
+        f"data sampai tahun {tahun_max}. "
+        f"Pastikan dataset_indramayu_depok.csv "
+        f"sudah memiliki data tahun 2024 untuk "
+        f"Indramayu dan Kota Depok."
+    )
+
+
+# =========================================================
+# DATA AKTUAL
 # =========================================================
 
 st.subheader(
-    "Data Aktual Kabupaten Indramayu "
-    "dan Kota Depok Tahun 2018–2023"
+    "Data Aktual 2018–2024"
 )
 
 
@@ -332,7 +357,9 @@ st.dataframe(
         kolom_wajib
     ],
 
-    use_container_width=True
+    use_container_width=True,
+
+    hide_index=True
 
 )
 
@@ -349,7 +376,7 @@ X_actual = df[
 df_actual = df.copy()
 
 
-# Prediksi Random Forest
+# Random Forest
 df_actual[
     "Prediksi Random Forest"
 ] = rf.predict(
@@ -357,7 +384,7 @@ df_actual[
 )
 
 
-# Prediksi Linear Regression
+# Linear Regression
 df_actual[
     "Prediksi Linear Regression"
 ] = lr.predict(
@@ -365,7 +392,7 @@ df_actual[
 )
 
 
-# Membulatkan hasil prediksi
+# Membulatkan hasil
 df_actual[
     "Prediksi Random Forest"
 ] = (
@@ -397,8 +424,7 @@ df_actual[
 # =========================================================
 
 st.subheader(
-    "Hasil Prediksi Model "
-    "Tahun 2018–2023"
+    "Hasil Prediksi Data Aktual 2018–2024"
 )
 
 
@@ -407,8 +433,6 @@ st.dataframe(
     df_actual[
 
         [
-
-            "kode_kabupaten_kota",
 
             "nama_kabupaten_kota",
 
@@ -424,27 +448,27 @@ st.dataframe(
 
     ],
 
-    use_container_width=True
+    use_container_width=True,
+
+    hide_index=True
 
 )
 
 
 # =========================================================
-# PREDIKSI TAHUN 2025–2027
+# HASIL PREDIKSI 2025–2027
 # =========================================================
 
 st.subheader(
-    "Prediksi Jumlah Balita Stunting "
-    "Tahun 2025–2027"
+    "Prediksi Jumlah Balita Stunting 2025–2027"
 )
 
 
-# Pastikan nama kolom hasil prediksi sesuai
 df_future = df_future.copy()
 
 
 # =========================================================
-# VALIDASI KOLOM HASIL PREDIKSI
+# VALIDASI HASIL PREDIKSI
 # =========================================================
 
 kolom_prediksi_wajib = [
@@ -476,8 +500,7 @@ kolom_prediksi_hilang = [
 if kolom_prediksi_hilang:
 
     st.error(
-        "Kolom pada hasil_prediksi_2025_2027.csv "
-        "tidak sesuai."
+        "Kolom hasil prediksi tidak sesuai."
     )
 
     st.write(
@@ -488,19 +511,41 @@ if kolom_prediksi_hilang:
         kolom_prediksi_hilang
     )
 
-    st.write(
-        "Kolom yang tersedia:"
-    )
-
-    st.write(
-        df_future.columns.tolist()
-    )
-
     st.stop()
 
 
 # =========================================================
-# MEMASTIKAN NILAI PREDIKSI TIDAK NEGATIF
+# KONVERSI NILAI PREDIKSI
+# =========================================================
+
+df_future[
+    "Prediksi Random Forest"
+] = pd.to_numeric(
+
+    df_future[
+        "Prediksi Random Forest"
+    ],
+
+    errors="coerce"
+
+)
+
+
+df_future[
+    "Prediksi Linear Regression"
+] = pd.to_numeric(
+
+    df_future[
+        "Prediksi Linear Regression"
+    ],
+
+    errors="coerce"
+
+)
+
+
+# =========================================================
+# RANDOM FOREST TIDAK BOLEH NEGATIF
 # =========================================================
 
 df_future[
@@ -509,39 +554,17 @@ df_future[
 
     0,
 
-    pd.to_numeric(
-
-        df_future[
-            "Prediksi Random Forest"
-        ],
-
-        errors="coerce"
-
-    )
+    df_future[
+        "Prediksi Random Forest"
+    ]
 
 )
 
 
-df_future[
-    "Prediksi Linear Regression"
-] = np.maximum(
+# =========================================================
+# MEMBULATKAN HASIL
+# =========================================================
 
-    0,
-
-    pd.to_numeric(
-
-        df_future[
-            "Prediksi Linear Regression"
-        ],
-
-        errors="coerce"
-
-    )
-
-)
-
-
-# Membulatkan prediksi
 df_future[
     "Prediksi Random Forest"
 ] = (
@@ -569,7 +592,7 @@ df_future[
 
 
 # =========================================================
-# TABEL HASIL PREDIKSI
+# TABEL PREDIKSI MINIMALIS
 # =========================================================
 
 st.dataframe(
@@ -577,8 +600,6 @@ st.dataframe(
     df_future[
 
         [
-
-            "kode_kabupaten_kota",
 
             "nama_kabupaten_kota",
 
@@ -592,25 +613,29 @@ st.dataframe(
 
     ],
 
-    use_container_width=True
+    use_container_width=True,
+
+    hide_index=True
 
 )
 
 
 # =========================================================
-# VISUALISASI PREDIKSI RANDOM FOREST
+# GRAFIK PREDIKSI 2025–2027
 # =========================================================
 
 st.subheader(
-    "Visualisasi Prediksi Random Forest "
-    "Tahun 2025–2027"
+    "Grafik Prediksi 2025–2027"
 )
 
 
-# Membuat grafik berdasarkan wilayah
-for wilayah in df_future[
-    "nama_kabupaten_kota"
-].unique():
+for wilayah in sorted(
+
+    df_future[
+        "nama_kabupaten_kota"
+    ].unique()
+
+):
 
     data_wilayah = df_future[
 
@@ -618,88 +643,9 @@ for wilayah in df_future[
             "nama_kabupaten_kota"
         ] == wilayah
 
-    ]
-
-
-    fig, ax = plt.subplots(
-
-        figsize=(10, 5)
-
+    ].sort_values(
+        "tahun"
     )
-
-
-    ax.bar(
-
-        data_wilayah[
-            "tahun"
-        ].astype(str),
-
-        data_wilayah[
-            "Prediksi Random Forest"
-        ]
-
-    )
-
-
-    ax.set_xlabel(
-        "Tahun"
-    )
-
-
-    ax.set_ylabel(
-        "Jumlah Balita Stunting"
-    )
-
-
-    ax.set_title(
-
-        "Prediksi Random Forest - "
-
-        + str(wilayah)
-
-    )
-
-
-    ax.grid(
-
-        axis="y",
-
-        alpha=0.3
-
-    )
-
-
-    st.pyplot(
-        fig
-    )
-
-
-    plt.close(
-        fig
-    )
-
-
-# =========================================================
-# PERBANDINGAN MODEL
-# =========================================================
-
-st.subheader(
-    "Perbandingan Prediksi "
-    "Random Forest dan Linear Regression"
-)
-
-
-for wilayah in df_future[
-    "nama_kabupaten_kota"
-].unique():
-
-    data_wilayah = df_future[
-
-        df_future[
-            "nama_kabupaten_kota"
-        ] == wilayah
-
-    ]
 
 
     fig, ax = plt.subplots(
@@ -747,7 +693,7 @@ for wilayah in df_future[
 
     ax.set_title(
 
-        "Perbandingan Model - "
+        "Prediksi Jumlah Balita Stunting - "
 
         + str(wilayah)
 
@@ -787,18 +733,21 @@ for wilayah in df_future[
 
 
 # =========================================================
-# TREN DATA AKTUAL DAN PREDIKSI
+# GRAFIK TREN AKTUAL DAN PREDIKSI
 # =========================================================
 
 st.subheader(
-    "Grafik Tren Jumlah Balita Stunting "
-    "Tahun 2018–2027"
+    "Grafik Tren Aktual dan Prediksi 2018–2027"
 )
 
 
-for wilayah in df[
-    "nama_kabupaten_kota"
-].unique():
+for wilayah in sorted(
+
+    df[
+        "nama_kabupaten_kota"
+    ].unique()
+
+):
 
     data_aktual = df[
 
@@ -806,7 +755,9 @@ for wilayah in df[
             "nama_kabupaten_kota"
         ] == wilayah
 
-    ]
+    ].sort_values(
+        "tahun"
+    )
 
 
     data_prediksi = df_future[
@@ -815,7 +766,9 @@ for wilayah in df[
             "nama_kabupaten_kota"
         ] == wilayah
 
-    ]
+    ].sort_values(
+        "tahun"
+    )
 
 
     fig, ax = plt.subplots(
@@ -858,7 +811,7 @@ for wilayah in df[
 
         linestyle="--",
 
-        label="Prediksi Random Forest"
+        label="Random Forest"
 
     )
 
@@ -878,7 +831,7 @@ for wilayah in df[
 
         linestyle=":",
 
-        label="Prediksi Linear Regression"
+        label="Linear Regression"
 
     )
 
@@ -889,7 +842,7 @@ for wilayah in df[
 
         + str(wilayah)
 
-        + " Tahun 2018–2027"
+        + " (2018–2027)"
 
     )
 
@@ -937,37 +890,34 @@ st.subheader(
 
 st.caption(
 
-    "Evaluasi model Random Forest Regressor "
-    "dan Linear Regression berdasarkan hasil "
-    "pelatihan model."
+    "Perbandingan performa Random Forest Regressor "
+    "dan Linear Regression berdasarkan data "
+    "historis tahun 2018–2024."
 
 )
 
 
-# Menampilkan hasil evaluasi
 st.dataframe(
 
     df_eval.style.format({
 
         "R2 Score":
-
         "{:.4f}",
 
         "MAE":
-
         "{:,.2f}",
 
         "MSE":
-
         "{:,.2f}",
 
         "RMSE":
-
         "{:,.2f}"
 
     }),
 
-    use_container_width=True
+    use_container_width=True,
+
+    hide_index=True
 
 )
 
@@ -985,7 +935,9 @@ st.dataframe(
 
     df_feature,
 
-    use_container_width=True
+    use_container_width=True,
+
+    hide_index=True
 
 )
 
@@ -1052,7 +1004,7 @@ plt.close(
 
 
 # =========================================================
-# KESIMPULAN PREDIKSI
+# KESIMPULAN
 # =========================================================
 
 st.subheader(
@@ -1060,7 +1012,10 @@ st.subheader(
 )
 
 
-# Mencari prediksi RF tertinggi
+# ---------------------------------------------------------
+# Random Forest
+# ---------------------------------------------------------
+
 idx_rf = df_future[
     "Prediksi Random Forest"
 ].idxmax()
@@ -1097,7 +1052,10 @@ nilai_rf = df_future.loc[
 ]
 
 
-# Mencari prediksi LR tertinggi
+# ---------------------------------------------------------
+# Linear Regression
+# ---------------------------------------------------------
+
 idx_lr = df_future[
     "Prediksi Linear Regression"
 ].idxmax()
@@ -1134,26 +1092,51 @@ nilai_lr = df_future.loc[
 ]
 
 
-st.info(
+# ---------------------------------------------------------
+# Menentukan model terbaik berdasarkan R2
+# ---------------------------------------------------------
 
-    f"**Random Forest Regressor:** "
+model_terbaik = None
 
-    f"Prediksi tertinggi diperkirakan terjadi "
 
+if "R2 Score" in df_eval.columns:
+
+    idx_terbaik = df_eval[
+        "R2 Score"
+    ].idxmax()
+
+    model_terbaik = df_eval.loc[
+        idx_terbaik,
+        "Model"
+    ]
+
+
+# ---------------------------------------------------------
+# Kesimpulan
+# ---------------------------------------------------------
+
+kesimpulan = (
+
+    f"Berdasarkan hasil prediksi tahun 2025–2027, "
+    f"Random Forest menghasilkan prediksi tertinggi "
     f"di {wilayah_rf} pada tahun {tahun_rf} "
-
-    f"dengan jumlah sekitar "
-
-    f"{nilai_rf:,.0f} kasus. "
-
-    f"**Linear Regression:** "
-
-    f"Prediksi tertinggi diperkirakan terjadi "
-
+    f"dengan estimasi sekitar {nilai_rf:,.0f} kasus. "
+    f"Linear Regression menghasilkan prediksi tertinggi "
     f"di {wilayah_lr} pada tahun {tahun_lr} "
+    f"dengan estimasi sekitar {nilai_lr:,.0f} kasus."
+)
 
-    f"dengan jumlah sekitar "
 
-    f"{nilai_lr:,.0f} kasus."
+if model_terbaik is not None:
 
+    kesimpulan += (
+
+        f" Berdasarkan nilai R², model dengan performa "
+        f"terbaik adalah {model_terbaik}."
+
+    )
+
+
+st.info(
+    kesimpulan
 )
