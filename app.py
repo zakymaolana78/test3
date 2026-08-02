@@ -58,9 +58,19 @@ def load_data():
     )
 
     # Mengubah koma desimal menjadi titik
+    # CATATAN PERBAIKAN:
+    # Sebelumnya kondisi ini hanya mengecek dtype == "object".
+    # Di pandas versi baru (pandas 3.x), kolom teks bisa
+    # bertipe StringDtype (bukan object), sehingga kondisi lama
+    # tidak pernah terpenuhi dan koma desimal tidak pernah
+    # diganti menjadi titik. Akibatnya nilai seperti "97,96"
+    # gagal dikonversi ke angka, menjadi NaN, lalu terhapus oleh
+    # dropna() -- inilah yang menyebabkan data tahun 2024 hilang.
+    # Fix: gunakan pd.api.types.is_string_dtype() agar mengenali
+    # baik dtype "object" (pandas lama) maupun "string" (pandas baru).
     for kolom in df.columns:
 
-        if df[kolom].dtype == "object":
+        if df[kolom].dtype == "object" or pd.api.types.is_string_dtype(df[kolom]):
 
             df[kolom] = (
                 df[kolom]
