@@ -662,6 +662,39 @@ st.subheader(
 )
 
 
+# Batas skala sumbu Y disamakan untuk semua wilayah
+# agar grafik Kabupaten Indramayu dan Kota Depok
+# dapat dibandingkan pada rentang yang sama
+# (minimal sampai 10000, mengikuti skala Kota Depok).
+
+y_min_prediksi = min(
+
+    df_future["Prediksi Random Forest"].min(),
+
+    df_future["Prediksi Linear Regression"].min()
+
+)
+
+
+y_max_prediksi = max(
+
+    df_future["Prediksi Random Forest"].max(),
+
+    df_future["Prediksi Linear Regression"].max(),
+
+    10000
+
+)
+
+
+# Menambahkan padding di atas dan di bawah
+padding_prediksi = (y_max_prediksi - y_min_prediksi) * 0.05
+
+batas_bawah_prediksi = y_min_prediksi - padding_prediksi
+
+batas_atas_prediksi = y_max_prediksi + padding_prediksi
+
+
 for wilayah in sorted(
 
     df_future[
@@ -734,6 +767,16 @@ for wilayah in sorted(
 
     ax.set_ylabel(
         "Jumlah Balita Stunting"
+    )
+
+
+    # Skala sumbu Y disamakan (lihat perhitungan di atas)
+    ax.set_ylim(
+
+        batas_bawah_prediksi,
+
+        batas_atas_prediksi
+
     )
 
 
