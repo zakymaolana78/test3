@@ -765,14 +765,15 @@ for wilayah in sorted(
     )
 
 
-    ax.set_xlabel(
-        "Tahun"
-    )
-
-
-    ax.set_ylabel(
-        "Jumlah Balita Stunting"
-    )
+    ax.set_xlabel("Tahun")
+    ax.set_ylabel("Jumlah Balita Stunting")
+    
+    # Menampilkan seluruh tahun
+    ax.set_xticks(range(2018, 2028))
+    ax.set_xticklabels(range(2018, 2028))
+    
+    # Membatasi sumbu X
+    ax.set_xlim(2018, 2027)
 
 
     # Batas atas disamakan, batas bawah mengikuti data wilayah
@@ -914,14 +915,15 @@ for wilayah in sorted(
     )
 
 
-    ax.set_xlabel(
-        "Tahun"
-    )
-
-
-    ax.set_ylabel(
-        "Jumlah Balita Stunting"
-    )
+    ax.set_xlabel("Tahun")
+    ax.set_ylabel("Jumlah Balita Stunting")
+    
+    # Menampilkan seluruh tahun
+    ax.set_xticks(range(2018, 2028))
+    ax.set_xticklabels(range(2018, 2028))
+    
+    # Membatasi sumbu X
+    ax.set_xlim(2018, 2027)
 
 
     ax.legend()
