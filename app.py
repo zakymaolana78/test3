@@ -661,57 +661,106 @@ st.subheader(
     "Grafik Prediksi Tahun 2025–2027"
 )
 
+
 for wilayah in sorted(
-    df_future["nama_kabupaten_kota"].unique()
+
+    df_future[
+        "nama_kabupaten_kota"
+    ].unique()
+
 ):
 
     data_wilayah = df_future[
-        df_future["nama_kabupaten_kota"] == wilayah
+
+        df_future[
+            "nama_kabupaten_kota"
+        ] == wilayah
+
     ]
 
-    fig, ax = plt.subplots(figsize=(10,5))
+
+    fig, ax = plt.subplots(
+
+        figsize=(10, 5)
+
+    )
+
 
     ax.plot(
+
         data_wilayah["tahun"],
-        data_wilayah["Prediksi Random Forest"],
+
+        data_wilayah[
+            "Prediksi Random Forest"
+        ],
+
         marker="o",
-        linewidth=2,
+
         label="Random Forest"
+
     )
 
+
     ax.plot(
+
         data_wilayah["tahun"],
-        data_wilayah["Prediksi Linear Regression"],
+
+        data_wilayah[
+            "Prediksi Linear Regression"
+        ],
+
         marker="s",
+
         linestyle="--",
-        linewidth=2,
+
         label="Linear Regression"
+
     )
+
 
     ax.set_title(
-        f"Prediksi Jumlah Balita Stunting - {wilayah}"
+
+        "Prediksi Jumlah Balita Stunting - "
+
+        + str(wilayah)
+
     )
 
-    ax.set_xlabel("Tahun")
-    ax.set_ylabel("Jumlah Balita Stunting")
 
-    # =====================================================
-    # Atur sumbu Y
-    # =====================================================
-    nilai_maks = max(
-        data_wilayah["Prediksi Random Forest"].max(),
-        data_wilayah["Prediksi Linear Regression"].max()
+    ax.set_xlabel(
+        "Tahun"
     )
 
-    batas_atas = max(10000, nilai_maks + 1000)
 
-    ax.set_ylim(0, batas_atas)
+    ax.set_ylabel(
+        "Jumlah Balita Stunting"
+    )
+
 
     ax.legend()
-    ax.grid(True, alpha=0.3)
 
-    st.pyplot(fig)
-    plt.close(fig)
+
+    ax.grid(
+
+        True,
+
+        alpha=0.3
+
+    )
+
+
+    st.pyplot(
+
+        fig
+
+    )
+
+
+    plt.close(
+
+        fig
+
+    )
 
 # =========================================================
 # 19. GRAFIK TREN DATA AKTUAL DAN PREDIKSI
