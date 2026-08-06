@@ -1115,12 +1115,12 @@ st.info(
     f"**Random Forest Regressor:** "
     f"Prediksi tertinggi diperkirakan terjadi "
     f"di {wilayah_rf} pada tahun {tahun_rf} "
-    f"dengan jumlah sekitar {nilai_rf:,.0f} kasus. "
+    f"dengan jumlah sekitar {nilai_rf:,.0f} Jumlah Balita Stunting. "
     f"\n\n"
     f"**Linear Regression:** "
     f"Prediksi tertinggi diperkirakan terjadi "
     f"di {wilayah_lr} pada tahun {tahun_lr} "
-    f"dengan jumlah sekitar {nilai_lr:,.0f} kasus."
+    f"dengan jumlah sekitar {nilai_lr:,.0f} Jumlah Balita Stunting."
 
 )
 
