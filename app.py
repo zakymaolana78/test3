@@ -662,21 +662,15 @@ st.subheader(
 )
 
 
-# Batas skala sumbu Y disamakan untuk semua wilayah
-# agar grafik Kabupaten Indramayu dan Kota Depok
-# dapat dibandingkan pada rentang yang sama
-# (minimal sampai 10000, mengikuti skala Kota Depok).
+# Batas ATAS sumbu Y disamakan untuk semua wilayah
+# (minimal sampai 10000, mengikuti skala Kota Depok)
+# supaya kedua grafik bisa dibandingkan.
+# Batas BAWAH sengaja TIDAK disamakan -- kalau ikut
+# nilai terendah Kota Depok (Linear Regression yang
+# turun sampai minus), grafik Indramayu jadi terjepit
+# dan garisnya kelihatan datar/susah dibaca.
 
-y_min_prediksi = min(
-
-    df_future["Prediksi Random Forest"].min(),
-
-    df_future["Prediksi Linear Regression"].min()
-
-)
-
-
-y_max_prediksi = max(
+batas_atas_prediksi = max(
 
     df_future["Prediksi Random Forest"].max(),
 
@@ -686,13 +680,7 @@ y_max_prediksi = max(
 
 )
 
-
-# Menambahkan padding di atas dan di bawah
-padding_prediksi = (y_max_prediksi - y_min_prediksi) * 0.05
-
-batas_bawah_prediksi = y_min_prediksi - padding_prediksi
-
-batas_atas_prediksi = y_max_prediksi + padding_prediksi
+batas_atas_prediksi = batas_atas_prediksi * 1.05
 
 
 for wilayah in sorted(
@@ -710,6 +698,23 @@ for wilayah in sorted(
         ] == wilayah
 
     ]
+
+
+    # Batas bawah dihitung per wilayah, dari data
+    # wilayah itu sendiri, dengan sedikit padding
+    y_min_wilayah = min(
+
+        data_wilayah["Prediksi Random Forest"].min(),
+
+        data_wilayah["Prediksi Linear Regression"].min(),
+
+        0
+
+    )
+
+    padding_bawah = abs(y_min_wilayah) * 0.1 + 200
+
+    batas_bawah_wilayah = y_min_wilayah - padding_bawah
 
 
     fig, ax = plt.subplots(
@@ -770,10 +775,10 @@ for wilayah in sorted(
     )
 
 
-    # Skala sumbu Y disamakan (lihat perhitungan di atas)
+    # Batas atas disamakan, batas bawah mengikuti data wilayah
     ax.set_ylim(
 
-        batas_bawah_prediksi,
+        batas_bawah_wilayah,
 
         batas_atas_prediksi
 
